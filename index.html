@@ -1,0 +1,916 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<title>PL/SQL: The Good Parts, by Morten Braten</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=792, user-scalable=no">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<link rel="stylesheet" href="shower/themes/ribbon/styles/screen.css">
+</head>
+<body class="list">
+	<header class="caption">
+		<h1>PL/SQL: The Good Parts</h1>
+		<p>by Morten Braten</p>
+	</header>
+	<style>
+	  header h1, header p { color: #ffffff; }
+      h2.invert { color:#ffffff; }
+      .cover img { width: 100%; }
+	</style>
+
+	</style>
+	<section class="slide cover" id="main-cover"><div>
+		<h2>PL/SQL: The Good Parts</h2>
+		<p>By <a href="https://twitter.com/mortenbraten">Morten Braten</a>, inspired by <a href="https://www.youtube.com/watch?v=hQVTIJBZook">Douglas Crockford</a></p>
+		<img src="pictures/bee.jpg" alt="">
+		<!--
+			To apply styles to the certain slides
+			set slide ID to get needed elements
+			-->
+		<style>
+			#main-cover h2 {
+				margin:30px 0 0;
+				color:#4a4a4a;
+				text-align:center;
+				font-size:70px;
+				}
+			#main-cover p {
+				margin:10px 0 0;
+				text-align:center;
+				color:#4a4a4a;
+				font-style:italic;
+				font-size:20px;
+				}
+				#main-cover p a {
+					color:#4a4a4a;
+					}
+		</style>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Disclaimer</h2>
+		<p>I do not work for Oracle. I don't own Oracle stock. These are my own opinions. Yada yada yada.</p>
+		<p>This is not intended as an introduction to PL/SQL, but rather an overview of features you should consider if you want to maximize your enjoyment of programming in the Oracle Database. Also, this is not an exhaustive list of all features, it's simply the ones I personally use frequently.</p>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Introduction</h2>
+		<p>In a world where programming languages and frameworks come and go, I like the simplicity and stability of PL/SQL. I have worked with it for almost 20 years, and I still have code that was originally written for Oracle 7 that runs happily in production to this day.</p>
+		<p>If used properly and to its full capability, PL/SQL is a powerful, elegant and fun tool. Let's see how...</p>
+	</div></section>
+
+	<section class="slide shout"><div>
+		<h2><span style="color:orange;">Procedural Language /</span> Structured Query Language</h2>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>PL/SQL? Isn't that some old, ugly shit?</h2>
+		<img src="pictures/plsql_ugly.png">
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Not your father's PL/SQL</h2>
+		<p><img src="pictures/plsql_pretty.png"></p>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Not all database programming languages are created equal...</h2>
+		<table>
+		<tr>
+			<th scope="col">Feature</th>
+			<th>PL/SQL</th>
+			<th>T-SQL</th>
+			<th>MySQL</th>
+		</tr>
+		<tr>
+			<th scope="row">Procedures</th>
+			<td>1989</td>
+			<td>1993</td>
+			<td>2005</td>
+		</tr>
+			<tr>
+			<th scope="row">Functions</th>
+			<td>1989</td>
+			<td>2000</td>
+			<td>2005</td>
+		</tr>
+		<tr>
+			<th scope="row">Exceptions</th>
+			<td>1989</td>
+			<td>2005</td>
+			<td>N/A</td>
+		</tr>
+		<tr>
+			<th scope="row">Packages</th>
+			<td>1989</td>
+			<td>N/A</td>
+			<td>N/A</td>
+		</tr>
+		</table>
+	</div></section>
+
+	<section class="slide cover"><div>
+		<h2 class="invert">Basic PL/SQL Language Goodness</h2>
+		<img src="pictures/typewriter.jpg">
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Encapsulation via Packages</h2>
+		<p>Separate interface (specification) from implementation (body)</p>
+		<pre>
+			<code>create or replace <mark>package</mark> invoice_pkg
+...
+
+create or replace <mark>package body</mark> invoice_pkg
+...
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide shout"><div>
+		<h2>Never use stand-alone procedures</h2>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Package Constants</h2>
+		<p>Define constant values in your packages. Use them to avoid hardcoding literal values, and to make your code more readable.</p>
+		<pre>
+			<code>g_status_draft      <mark>constant</mark> varchar2(20) := 'DRAFT';
+g_status_invoiced   <mark>constant</mark> varchar2(20) := 'INVOICED';				
+g_status_cancelled  <mark>constant</mark> varchar2(20) := 'CANCELLED';
+
+if (l_invoice.status = g_status_cancelled) then ...
+</code>
+		</pre>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Program Overloading</h2>
+		<p>Same name for multiple functions or procedures, with different parameters. Use it to build better and more flexible APIs.</p>
+		<pre>
+			<code>function <mark>to_str (p_date in date)</mark> return varchar2;
+function <mark>to_str (p_boolean in boolean)</mark> return varchar2;
+function <mark>to_str (p_number in number)</mark> return varchar2;
+</code>
+		</pre>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Default Parameter Values</h2>
+		<p>Use them to build better APIs by setting sensible defaults for rarely-used parameters. Choose one syntax (default or :=) and stick with it.</p>
+		<pre>
+			<code>
+function get_vat (p_amount in number,
+                  p_vat_rate in number <mark>default 0.25</mark>,
+                  p_special_rule in boolean <mark>:= false</mark>)
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Named Parameters</h2>
+		<p>Use them to improve readability of code, where necessary (especially useful when passing booleans or null values).</p>
+		<pre>
+			<code>
+  invoice_pkg.create_credit_note (
+    <mark>p_invoice_id =></mark> 1234,
+    <mark>p_include_vat =></mark> false,
+    <mark>p_customer_remarks =></mark> null
+  );
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>User-Defined Record Types</h2>
+		<p>User-defined record types can be extended without breaking existing code. Use them to pass around multiple values not directly mapped to a table row. Record types can be nested.</p>
+		<pre>
+			<code><mark>type</mark> t_url <mark>is record</mark> (
+  protocol          varchar2(10),
+  link_address      t_address
+);
+function get_url (...) return t_url;
+if get_url().protocol = 'http' then ...
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>The IN Operator</h2>
+		<p>Check a value against a set of values</p>
+		<pre>
+			<code>if l_invoice.status <mark>in</mark> ('DRAFT', 'APPROVED') then
+  ...
+end if;
+</code>
+		</pre>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>CASE</h2>
+		<p>Replace multiple if/elsif with a single case statement. When clause can be simple or complex.</p>
+		<pre>
+			<code>l_color := <mark>case</mark>
+  when l_invoice.status = g_status_draft then 'lightgrey'
+  when l_invoice.status = g_status_paid
+    and l_invoice.amount is not null then 'green'
+  else 'red'
+end;
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>COALESCE</h2>
+		<p>Using coalesce instead of nvl allows you to specify more than two arguments, and enjoy short circuit evaluation</p>
+		<pre>
+			<code>l_tax_code := <mark>coalesce</mark> (
+  l_invoice.tax,
+  l_config.default_tax,
+  get_tax() -- not called unless other params are null
+);
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Regular Expressions</h2>
+		<p>If you can make sense of the crazy regex syntax, regular expressions are very powerful, and well supported in both SQL and PL/SQL via regexp_like, regexp_replace, regexp_instr, and regexp_substr.</p>
+		<pre>
+			<code>-- get Anderson, Andersen, or Andersan
+select last_name
+from contacts
+where <mark>regexp_like</mark> (last_name, 'Anders(o|e|a)n');
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Easy Date Math</h2>
+		<p>Dates can be treated as numbers, allowing for addition and subtraction without any special functions. Several specialized date functions exist.</p>
+		<pre>
+			<code>l_due_date := l_invoice_date <mark>+</mark> 14;
+l_days_since_invoice := sysdate <mark>-</mark> l_invoice_date;
+l_due_date := <mark>add_months</mark> (sysdate, 2); -- 2 months from now
+l_due_date := <mark>last_day</mark> (sysdate); -- last day of the month
+l_year := <mark>round</mark>(sysdate, 'YEAR'); -- get year from date
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Flexible Date and Number Formatting</h2>
+		<p>Using to_char, to_number and to_date you can convert between values easily. Always specify an explicit format mask.</p>
+		<pre>
+			<code>l_date_str := <mark>to_char</mark> (sysdate, 'dd.mm.yyyy hh24:mi:ss') ;
+l_amount := <mark>to_number</mark> (p_input_str, '999.99');
+l_date_from_xml :=
+  <mark>to_date</mark> ('2002-05-30T09:00:00',
+           'yyyy-mm-dd"T"hh24:mi:ss'
+          );
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Associative Arrays</h2>
+		<p>Using a string as a key to look up another string.</p>
+		<pre>
+			<code><mark>type</mark> t_countries <mark>is table of varchar2(255)
+  index by varchar2(2)</mark>;
+
+l_countries t_countries;
+
+l_countries ('UK') := 'United Kingdom';
+l_countries ('US') := 'United States';
+l_countries ('ES') := 'Spain';
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Working with sets using MULTISET</h2>
+		<p>Use set operations (union, intersect and minus) on PL/SQL arrays. <a href="http://www.oratable.com/multiset-operations/">More...</a></p>
+		<pre>
+			<code>l_engineers := t_employee_tab ('John', 'Joe', 'Sam');
+l_poorly_paid := t_employee_tab ('Frank', 'Sam', 'Tom');
+
+l_poorly_paid_engineers :=
+  l_engineers <mark>multiset intersect</mark> l_poorly_paid;		
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Pipelined Functions</h2>
+		<p>Use pipelined functions to return table-like result sets from PL/SQL code. Use it to perform complex calculations, merge data from multiple sources, or get data from external sources (such as web services).</p>
+		<pre>
+			<code>function get_search_results (p_search_string in varchar2)
+  return t_search_result_tab <mark>pipelined</mark>;
+
+select * from table(search_pkg.get_search_results(...));
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide cover"><div>
+		<h2>PL/SQL Goodness, part two: Tight Integration with SQL and the Database</h2>
+		<p>(This is a Big Deal and is what makes PL/SQL such a good choice for working with the database)</p>
+		<img src="pictures/cloud.jpg">
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>PL/SQL Code Runs INSIDE the Database</h2>
+		<ol>
+			<li>Easy (easy to use SQL and database features directly; no need for client drivers, connection management, frameworks, and boilerplate code)</li>
+			<li>Efficient (reduces network traffic)</li>
+			<li>Secure (integrated with database security features; provides an API on top of tables for clients)</li>
+			<li>Portable (runs on any OS that the database runs on; can be called from any other programming language)</li>
+		</ol>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Good Riddance</h2>
+		<p>Programming languages that run outside the database must manage connections, map data types and marshal calls. Not so with PL/SQL!</p>
+		<img src="pictures/csharp_oracle_connection_denied.png">
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>SQL Compatible</h2>
+		<p>All SQL data types are also available in PL/SQL, and all advanced SQL features (such as analytic functions) are available in PL/SQL.</p>
+		<pre>
+			<code>select empno, sal,
+  <mark>dense_rank() over (
+    partition by deptno order by sal desc nulls last
+    ) as dense_rank</mark>
+from emp
+order by 2, dense_rank
+</code>
+		</pre>
+	</div></section>
+
+<section class="slide"><div>
+		<h2>Automatic Bind Variables</h2>
+		<p>When you code DML statements in PL/SQL, variables and parameters are automatically turned into bind variables. There is no need to define and bind the variables like you would in a programming language outside the database.</p>
+		<pre>
+			<code>update invoice
+set invoice_title = <mark>l_invoice_title</mark>
+where invoice_id = <mark>p_invoice_id</mark>;
+</code>
+		</pre>
+	</div></section>
+
+<section class="slide"><div>
+		<h2>%TYPE</h2>
+		<p>Anchor variable declarations to column types. Use it so you don't have to rewrite code when column definitions change.</p>
+		<pre>
+			<code>l_invoice_status   invoice.status<mark>%type</mark>;
+l_invoice_amount   invoice.total_amount<mark>%type</mark>;
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>%ROWTYPE</h2>
+		<p>Anchor variable declarations to table rows. Use it for shorter, more elegant code. Notice also the "set row" syntax for updates.</p>
+		<pre>
+			<code>l_invoice invoice<mark>%rowtype</mark>;
+function get_invoice (...) return invoice<mark>%rowtype</mark>;
+l_invoice := get_invoice (p_invoice_id => 555);
+procedure set_invoice (p_row in invoice<mark>%rowtype)</mark>;
+set_invoice (l_invoice);
+update invoice <mark>set row</mark> = p_row where ...;
+</code>
+		</pre>
+	</div></section>
+
+
+
+<section class="slide"><div>
+		<h2>Implicit Cursors (1)</h2>
+		<p>Makes it super-easy to process rows.</p>
+		<pre>
+			<code>for <mark>l_rec in (select * from emp)</mark> loop
+  htp.p('&lt;li&gt;' || l_rec.ename || '&lt;/li&gt;');
+end loop;</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Implicit Cursors (2)</h2>
+		<p>Non-trivial queries should be declared in the declaration section. They can also be declared as package-level cursors to be reused in multiple subroutines.</p>
+		<pre>
+			<code>declare
+  <mark>cursor</mark> l_complex_query_cursor
+  is
+  select ... ;
+begin
+  for l_rec in l_complex_query_cursor loop
+    ...
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Important Note Regarding Cursors</h2>
+		<p>Do not use a cursor with row-by-row (aka "slow-by-slow") processing if a single, set-based SQL statement can do the job. Set-based operations perform much better. If cursors can't be avoided, look into bulk collect.</p>
+		<pre>
+			<code>update invoice
+set due_date = due_date + 1
+where status != g_status_posted;
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Dynamic SQL and PL/SQL</h2>
+		<p>Run dynamic SQL and PL/SQL -- but beware SQL injection! Use dbms_assert for sanity checks. Use dbms_sql for more complex cases.</p>
+		<pre>
+			<code><mark>execute immediate</mark>
+'begin ' ||
+dbms_assert.sql_object_name(l_my_proc_name) || ' (:b1); ' ||
+'end;'
+using l_my_value;
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>XMLType</h2>
+		<p>XML generation, transformation, validation and parsing is very well supported in the database.</p>
+		<pre>
+			<code>l_xml <mark>xmltype</mark>;
+l_xml := xmltype ('&lt;invoice&gt;...&lt;/invoice&gt;');
+l_str := l_xml.extract ('//invoice/currency/text()')
+  .getStringVal();
+l_new_xml := l_xml.transform (l_xsl_stylesheet);
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>JSON</h2>
+		<p>Oracle 12 has native JSON support, Apex 5 has apex_json package.</p>
+		<pre>
+			<code>-- Oracle 12
+select <mark>i.my_json_column.CustomerData.CreditRating</mark>
+from invoice i
+
+-- Oracle 10/11 with Apex 5
+<mark>apex_json</mark>.parse(l_values, '{"items":[1,2,{"foo":42}]}');
+l_val := apex_json.get_varchar2(
+  p_path=>'items[%d].foo', p0 => 3, p_values => l_values));
+</code>
+		</pre>
+	</div></section>
+
+<section class="slide"><div>
+		<h2>Built-in Packages</h2>
+		<p>There are literally hundreds of built-in PL/SQL packages. <a href="http://docs.oracle.com/database/121/ARPLS/toc.htm">Reference</a></p>
+		<pre>
+			<code>dbms_application_info, dbms_assert, dbms_crypto, ...
+dbms_job, dbms_ldap, dbms_output, ...
+utl_http, utl_tcp, utl_smtp, utl_url, ...
+utl_encode, utl_file, utl_match, ...
+apex_json, apex_util, apex_web_service, apex_zip, ...
+owa_cookie, owa_util, htp, htf, ...
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Background Jobs</h2>
+		<p>Jobs are perfect for any long-running process, running either at specified intervals or as a one-time job (no interval). See also the dbms_parallel_execute package.</p>
+		<pre>
+			<code>declare
+  l_job_id number;
+begin
+  <mark>dbms_job</mark>.submit (l_job_id,
+    what => 'invoice_pkg.process_payments;',
+    interval => 'sysdate+1'); -- null to run only once
+end;
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>PL/SQL Web Toolkit (OWA)</h2>
+		<p>When connected to an HTTP gateway*, PL/SQL can generate web content directly from the database via the htp (HyperText Procedures) package.</a></p>
+		<pre>
+			<code>htp.p('&lt;div id="my-widget"&gt;Hello World&lt;/div&gt;');
+</code>
+		</pre>
+		<p>* Supported options include the Embedded PL/SQL Gateway aka dbms_epg, Apache mod_plsql, or Oracle REST Data Services aka ORDS.</p>
+	</div></section>
+
+<section class="slide"><div>
+		<h2>Application Express (Apex)</h2>
+		<p><a href="https://apex.oracle.com/">Apex</a> is a modern web development framework built on top of the PL/SQL Web Toolkit. At its core, it consists of nothing more than application metadata in tables and large amounts of PL/SQL code.</p>
+		<p>As of Apex 4, it <a href="http://www.oracle.com/technetwork/developer-tools/apex/apex-arch-086399.html">was said</a> to consist of approximately 425 tables and 230 PL/SQL packages containing 425,000+ lines of code. Apex 5 is even bigger. Apex is a good example of PL/SQL goodness.</p>
+	</div></section>
+
+ 
+
+	<section class="slide cover"><div>
+		<h2 class="invert">Goodness, part three: Error Handling, or Dealing with Badness</h2>
+		<img src="pictures/pier.jpg">
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Best Practices</h2>
+		<ol>
+			<li>Instrument your code by logging debug messages, warnings and errors (see <a href="https://github.com/OraOpenSource/Logger">Logger for PL/SQL</a>). Leave the logging on in production.</li>
+			<li class="next">Use assertions to validate program inputs and outputs</li>
+			<li class="next">Functions should have one (and only one!) <code>return</code> statement</li>
+			<li class="next">Use exceptions (not error return codes!) to deal with errors</li>
+			<li class="next">Use information in the error stack (backtrace) to track down errors</li>
+			<li class="next">Use the data dictionary to verify absence of compilation errors</li>
+		</ol>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Autonomous Transactions for Logging</h2>
+		<p>Log debug info and errors into a log table using autonomous transactions, not interfering with your main transaction.</p>
+		<pre>
+			<code>procedure log (p_text in varchar2)
+as
+  <mark>pragma autonomous_transaction</mark>;
+begin
+  insert into log (...) values (...);
+  <mark>commit;</mark>
+end;
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Improve Code Quality with Assertions</h2>
+		<p>Create an assert procedure and use it to validate inputs and outputs.</p>
+		<pre>
+			<code>procedure assert (p_condition in boolean, p_message in varchar2)
+...
+  if not nvl(p_condition, false) then
+    raise_application_error (-20000, p_message);
+  end if;
+...
+assert_pkg.<mark>assert</mark> (p_amount is not null,
+  'Invoice amount must be specified!');
+assert_pkg.<mark>assert</mark> (p_due_date > sysdate, 'Invalid due date!');
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Exception Handling (1)</h2>
+		<p>Wrap code in block that has exception section. Only handle specific, "expected" errors. Unhandled errors propagate to caller.</p>
+		<pre>
+			<code>begin
+  do_stuff();
+<mark>exception</mark>
+  when no_data_found then
+    l_returnvalue := null;
+end;
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Exception Handling (2)</h2>
+		<p>Avoid using "WHEN OTHERS" unless you know what you are doing. There are some legitimate uses for it, though.</p>
+		<pre>
+			<code>begin
+  l_returnvalue := to_number (p_input_str);
+exception
+  <mark>when others</mark> then
+    l_returnvalue := null; -- ignore invalid input
+end;
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Error Stack</h2>
+		<p>The backtrace is a trace from where the exception was thrown to where the backtrace was examined.</p>
+		<pre>
+			<code>-- Oracle 10 and 11: backtrace as simple string
+l_error_backtrace := <mark>dbms_utility.format_error_backtrace</mark>;
+
+-- Oracle 12: backtrace as set of API functions
+<mark>utl_call_stack</mark>.backtrace_depth
+<mark>utl_call_stack</mark>.backtrace_line()
+<mark>utl_call_stack</mark>.backtrace_unit()
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Errors and Invalid Objects</h2>
+		<p>Query the data dictionary to find errors and invalid objects.</p>
+		<pre>
+			<code>select * from <mark>user_errors</mark>;
+
+select * from <mark>user_objects where status != 'VALID'</mark>;
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Compiler Warnings</h2>
+		<p>In addition to compiler errors, you can also turn on warnings.</p>
+		<pre>
+			<code>alter session <mark>set plsql_warnings = 'ENABLE:ALL'</mark>;
+alter package invoice_pkg compile;
+select * from user_errors;
+</code>
+		</pre>
+	</div></section>
+
+	
+
+	<section class="slide cover"><div>
+		<h2>The Bad Parts</h2>
+		<img src="pictures/vintage-grey-airplane.jpg">
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Bad parts? What bad parts?</h2>
+		<p>Actually, PL/SQL does not have too many bad parts (and unlike Javascript, it does not have many bizarre quirks, either), but it just seems proper to devote a couple of slides to its limitations and annoyances. There's always room for improvement, right?</p>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Limitations</h2>
+		<ol>
+			<li>Identifiers (names of tables, packages, variables, etc) limited to 30 characters (<a href="http://ora-00001.blogspot.com/2015/07/longer-names-coming-to-oracle.html">may be fixed in Oracle 12.2 ???</a>)</li>
+			<li class="next">Cannot use PL/SQL package constants in SQL that is called outside of PL/SQL (this includes SQL in views), and therefore must "hardcode" literal strings and numbers in such cases</li>
+		</ol>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Annoyances</h2>
+		<ol>
+			<li class="next">No boolean data type in SQL, hence not possible to call PL/SQL functions with boolean parameters from SQL (workaround: write a wrapper that uses Y/N strings)</li>
+			<li class="next">The :old and :new pseudo-records in triggers cannot be passed to subprograms as records or %rowtypes (workaround: pass each value separately)</li>
+			<li class="next">UTL_FILE has no function to return a list of files in a folder (unsupported workaround exists)</li>
+			<!--<li class="next">Oracle Wallets are fiddly to work with, since certificates must be explicitly added before you can use UTL_HTTP with SSL</li>-->
+		</ol>
+	</div></section>
+
+	<section class="slide cover"><div>
+		<h2>The PL/SQL Coding Environment</h2>
+		<img src="pictures/pulpit_rock.jpg">
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Coding Conventions</h2>
+		<ol>
+			<li>Write code and queries in lowercase (UPPERCASE IS NOT PRETTY)</li>
+			<li>Indent code properly and consistently. Use spaces, not tabs!</li>
+			<li>Prefix local variables with l_ and parameters with p_ and types with t_</li>
+			<li>Include standard comment blocks for packages, function and procedure</li>
+		</ol>
+		<p class="note">These are only recommendations (but they are good recommendations!). Whatever you choose, be consistent.</p>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Use a Decent Editor for Coding</h2>
+		<p>Use a decent editor (Sublime Text, Notepad++, SQL Developer, etc) with PL/SQL syntax highlighting and code completion</p>
+		<p><a href="http://www.sublimetext.com/">Sublime Text</a> can be used on both Windows and OS X. Plugins provide syntax highlighting, code completion and a build system for PL/SQL. See <a href="http://wphilltech.com/sublime-text-for-oracle-apex-developers/">notes on using Sublime Text with PL/SQL</a> and <a href="https://github.com/bizoo/OracleSQL">download ST2 package for PL/SQL on Github</a>.</p>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Use SQL Developer for Queries & Browsing</h2>
+		<img src="pictures/sqldev_browser.gif">
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Use SQL Developer for PL/SQL Debugging</h2>
+		<img src="pictures/sqldev_debugger.png">
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Learn to Love sqlplus</h2>
+		<p>You will become much more productive if you learn how to use sqlplus to run scripts for deployment, patching, etc. See also the new <a href="http://www.thatjeffsmith.com/archive/2015/02/oracle-sqlcl-slidedeck-overview-of-our-new-command-line-interface/">sqlcl</a>.</p>
+		<pre>
+			<code><mark>sqlplus</mark> user@db
+@your_install_script.sql
+			</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Quoted Literals</h2>
+		<p>Embed single quotes in literal strings without having to resort to double, triple or sometimes quadruple quote characters.</p>
+		<pre>
+			<code>l_js := <mark>q'[</mark>var el = document.getElementById('foo');<mark>]'</mark>;
+			</code>
+		</pre>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>USER_SOURCE, Luke!</h2>
+		<p>Use the power of SQL to find strings in the source code, and to analyze it in various ways.</p>
+		<pre>
+			<code>select *
+from <mark>user_source</mark>
+where lower(text) like '%some_function%'
+order by type, name, line;
+
+select count(*)
+from <mark>user_source</mark>;
+</code>
+		</pre>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Use the Data Dictionary to Generate Code</h2>
+		<p>Use the information in the <a href="https://docs.oracle.com/cd/E11882_01/nav/catalog_views.htm">data dictionary</a> to quickly generate code.</p>
+		<pre>
+			<code>select 'drop table ' || table_name || ' purge;'
+from <mark>user_tables</mark>
+where table_name like 'TEST%'
+order by table_name;
+
+drop table TEST_01 purge;
+drop table TEST_STUFF purge;
+drop table TEST_XYZ purge;
+</code>
+		</pre>
+	</div></section>
+
+<section class="slide"><div>
+		<h2>Dependency Tracking</h2>
+		<p>The database automatically tracks dependencies between objects, such as database tables and your PL/SQL packages.</p>
+		<pre>
+			<code>select * from <mark>user_dependencies</mark>;
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Source Code Analysis with PL/SCOPE (1)</h2>
+		<p>Using PL/Scope, information about identifier types, usages (declaration, definition, reference, call, assigment) and the location of each usage in the source code is collected into data dictionary views.</p>
+		<pre>
+			<code>alter session <mark>set plscope_settings = 'IDENTIFIERS:ALL'</mark>;
+
+alter package invoice_pkg compile;
+
+select * from <mark>user_identifiers</mark>;
+</code>
+		</pre>
+	</div></section>
+
+
+<section class="slide"><div>
+		<h2>Source Code Analysis with PL/SCOPE (2)</h2>
+		<p>Example: Find all variables that are declared without an "l_" prefix, and therefore in violation of project's coding conventions.</p>
+		<pre>
+			<code>select *
+from <mark>user_identifiers</mark>
+where object_type = 'PACKAGE BODY'
+and usage = 'DECLARATION'
+and type = 'VARIABLE'
+and name not like 'L_%';
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Conditional Compilation</h2>
+		<p>Toggle what gets compiled via $if, $then, etc. There are <a href="http://www.slideshare.net/ScottWesley/conditional-compilation-34385560">many uses</a> for this.</p>
+		<pre>
+			<code><mark>$if</mark> debug_pkg.g_debug_enabled <mark>$then</mark>
+  dbms_output.put_line (l_value);
+<mark>$else</mark>
+  null;
+<mark>$end</mark>
+</code>
+		</pre>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Optimize Code for Production Deployment</h2>
+		<p>Make sure your code is always optimized when you deploy it.</p>
+		<pre>
+			<code>
+alter session <mark>set plsql_optimize_level = 2</mark>;
+
+@run_your_install_script.sql
+
+select *
+from user_plsql_object_settings;
+
+</code>
+		</pre>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Do Not Reinvent the Wheel</h2>
+		<p class="note">Use existing database features, built-in packages, and third-party libraries.</p>
+		<ol>
+			<li>XMLDB, Oracle Text, SQL analytic functions, etc</li>
+			<li>DBMS_* and UTL_* built-in packages</li>
+			<li>APEX_* packages</li>
+			<li><a href="https://github.com/mortenbra/alexandria-plsql-utils">Alexandria PL/SQL Utility Library</a></li>
+			<li><a href="https://github.com/OraOpenSource">OraOpenSource</a></li>
+		</ol>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>PL/SQL Resources</h2>
+		<ol>
+			<li><a href="http://www.oracle.com/plsql">oracle.com/plsql</a></li>
+			<li><a href="http://docs.oracle.com/database/121/LNPLS/toc.htm">PL/SQL Language Reference</a></li>
+			<li><a href="http://docs.oracle.com/database/121/ARPLS/toc.htm">PL/SQL Packages and Types Reference</a></li>
+			<li><a href="https://www.youtube.com/channel/UCpJpLMRm452kVcie3RpINPw/feed?view_as=public">Practically Perfect PL/SQL</a> YouTube Channel by Steven Feuerstein</li>
+			<li><a href="http://tutorials.plsqlchannel.com/public/">PL/SQL Channel</a>, aka "PL/SQL from dusk till dawn" with 27 hours (!) of video by Steven Feuerstein</li>
+		</ol>
+	</div></section>
+
+	<section class="slide shout"><div>
+		<h2>Procedural Language / <span style="color:orange;">Structured Query Language</span></h2>
+	</div></section>
+
+
+	<section class="slide"><div>
+		<h2>Do it in SQL</h2>
+		<figure>
+			<blockquote>
+				<p>Do it in SQL.<br>If you can't do it in SQL, do it in PL/SQL.<br>If you can't do it in PL/SQL, do it in Java (or whatever).</p>
+			</blockquote>
+			<figcaption>Tom Kyte (asktom.oracle.com)</figcaption>
+		</figure>
+	</div></section>
+
+<!--
+	<section class="slide shout"><div>
+		<h2>begin null; <span style="color:orange;">end;</span></h2>
+	</div></section>
+-->
+
+	<section class="slide shout" id="SeeMore"><div>
+		<h2><a href="https://twitter.com/mortenbraten">@mortenbraten</a></h2>
+		<style>
+			#Picture h2 {
+				color:#FFF;
+				}
+			#SeeMore h2 {
+				font-size:100px
+				}
+			#SeeMore img {
+				width:0.72em;
+				height:0.72em;
+				}
+		</style>
+	</div></section>
+	<!--<p class="badge"><a href="https://github.com/shower/shower">Fork me on Github</a></p>-->
+	<!--
+		To hide progress bar from entire presentation
+		just remove “progress” element.
+		-->
+	<div class="progress"><div></div></div>
+	<script src="shower/shower.min.js"></script>
+	<!-- Copyright © 2013 Yours Truly, Famous Inc. -->
+	<!-- Photos by John Carey, fiftyfootshadows.net -->
+</body>
+</html>
