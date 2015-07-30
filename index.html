@@ -338,9 +338,9 @@ select * from table(search_pkg.get_search_results(...));
 		<h2>PL/SQL Code Runs INSIDE the Database</h2>
 		<ol>
 			<li>Easy (easy to use SQL and database features directly; no need for client drivers, connection management, frameworks, and boilerplate code)</li>
-			<li>Efficient (reduces network traffic)</li>
-			<li>Secure (integrated with database security features; provides an API on top of tables for clients)</li>
-			<li>Portable (runs on any OS that the database runs on; can be called from any other programming language)</li>
+			<li class="next">Efficient (reduces network traffic)</li>
+			<li class="next">Secure (integrated with database security features; provides an API on top of tables for clients)</li>
+			<li class="next">Portable (runs on any OS that the database runs on; can be called from any other programming language)</li>
 		</ol>
 	</div></section>
 
@@ -522,7 +522,7 @@ end;
 		<h2>PL/SQL Web Toolkit (OWA)</h2>
 		<p>When connected to an HTTP gateway*, PL/SQL can generate web content directly from the database via the htp (HyperText Procedures) package.</a></p>
 		<pre>
-			<code>htp.p('&lt;div id="my-widget"&gt;Hello World&lt;/div&gt;');
+			<code><mark>htp.p</mark>('&lt;div id="my-widget"&gt;Hello World&lt;/div&gt;');
 </code>
 		</pre>
 		<p>* Supported options include the Embedded PL/SQL Gateway aka dbms_epg, Apache mod_plsql, or Oracle REST Data Services aka ORDS.</p>
