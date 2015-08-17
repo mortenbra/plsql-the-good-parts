@@ -217,11 +217,11 @@ end if;
 		<p>Replace multiple if/elsif with a single case statement. When clause can be simple or complex.</p>
 		<pre>
 			<code>l_color := <mark>case</mark>
-  when l_invoice.status = g_status_draft then 'lightgrey'
-  when l_invoice.status = g_status_paid
-    and l_invoice.amount is not null then 'green'
-  else 'red'
-end;
+  <mark>when</mark> l_invoice.status = g_status_draft <mark>then</mark> 'lightgrey'
+  <mark>when</mark> l_invoice.status = g_status_paid
+    and l_invoice.amount is not null <mark>then</mark> 'green'
+  <mark>else</mark> 'red'
+<mark>end</mark>;
 </code>
 		</pre>
 	</div></section>
@@ -699,7 +699,7 @@ select * from user_errors;
 			<li>Write code and queries in lowercase (UPPERCASE IS NOT PRETTY)</li>
 			<li>Indent code properly and consistently. Use spaces, not tabs!</li>
 			<li>Prefix local variables with l_ and parameters with p_ and types with t_</li>
-			<li>Include standard comment blocks for packages, function and procedure</li>
+			<li>Include standard comment blocks for packages, functions and procedures</li>
 		</ol>
 		<p class="note">These are only recommendations (but they are good recommendations!). Whatever you choose, be consistent.</p>
 	</div></section>
