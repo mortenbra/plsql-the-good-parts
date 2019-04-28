@@ -56,7 +56,7 @@
 
 	<section class="slide"><div>
 		<h2>Introduction</h2>
-		<p>In a world where programming languages and frameworks come and go, I like the simplicity and stability of PL/SQL. I have worked with it for almost 20 years, and I still have code that was originally written for Oracle 7 that runs happily in production to this day.</p>
+		<p>In a world where programming languages and frameworks come and go, I like the simplicity and stability of PL/SQL. I have worked with it for over 20 years, and I still have code that was originally written for Oracle 7 that runs happily in production to this day.</p>
 		<p>If used properly and to its full capability, PL/SQL is a powerful, elegant and fun tool. Let's see how...</p>
 	</div></section>
 
@@ -529,9 +529,9 @@ end;
 	</div></section>
 
 <section class="slide"><div>
-		<h2>Application Express (Apex)</h2>
-		<p><a href="https://apex.oracle.com/">Apex</a> is a modern web development framework built on top of the PL/SQL Web Toolkit. At its core, it consists of nothing more than application metadata in tables and large amounts of PL/SQL code.</p>
-		<p>As of Apex 4, it <a href="http://www.oracle.com/technetwork/developer-tools/apex/apex-arch-086399.html">was said</a> to consist of approximately 425 tables and 230 PL/SQL packages containing 425,000+ lines of code. Apex 5 is even bigger. Apex is a good example of PL/SQL goodness.</p>
+		<h2>Application Express (APEX)</h2>
+		<p><a href="https://apex.oracle.com/">APEX</a> is a modern web development framework built on top of the PL/SQL Web Toolkit. At its core, it consists of nothing more than application metadata in tables and large amounts of PL/SQL code.</p>
+		<p>As of APEX 4, it <a href="http://www.oracle.com/technetwork/developer-tools/apex/apex-arch-086399.html">was said</a> to consist of approximately 425 tables and 230 PL/SQL packages containing 425,000+ lines of code. Later APEX versions are even bigger. APEX is a good example of PL/SQL goodness.</p>
 	</div></section>
 
  
@@ -673,7 +673,7 @@ select * from user_errors;
 	<section class="slide"><div>
 		<h2>Limitations</h2>
 		<ol>
-			<li>Identifiers (names of tables, packages, variables, etc) limited to 30 characters (<a href="http://ora-00001.blogspot.com/2015/07/longer-names-coming-to-oracle.html">may be fixed in Oracle 12.2 ???</a>)</li>
+			<li><span style="text-decoration:line-through;">Identifiers (names of tables, packages, variables, etc) limited to 30 characters</span> (<a href="http://ora-00001.blogspot.com/2015/07/longer-names-coming-to-oracle.html">increased to 128 characters in Oracle 12.2</a>)</li>
 			<li class="next">Cannot use PL/SQL package constants in SQL that is called outside of PL/SQL (this includes SQL in views), and therefore must "hardcode" literal strings and numbers in such cases</li>
 		</ol>
 	</div></section>
@@ -706,8 +706,8 @@ select * from user_errors;
 
 	<section class="slide"><div>
 		<h2>Use a Decent Editor for Coding</h2>
-		<p>Use a decent editor (Sublime Text, Notepad++, SQL Developer, etc) with PL/SQL syntax highlighting and code completion</p>
-		<p><a href="http://www.sublimetext.com/">Sublime Text</a> can be used on both Windows and OS X. Plugins provide syntax highlighting, code completion and a build system for PL/SQL. See <a href="http://wphilltech.com/sublime-text-for-oracle-apex-developers/">notes on using Sublime Text with PL/SQL</a> and <a href="https://github.com/bizoo/OracleSQL">download ST2 package for PL/SQL on Github</a>.</p>
+		<p>Use a decent editor (VS Code, Sublime Text, Notepad++, SQL Developer, etc) with PL/SQL syntax highlighting and code completion</p>
+		<p><a href="https://code.visualstudio.com/">Visual Studio Code</a> can be used on both Windows and OS X. Extensions provide syntax highlighting, code completion and a build system for PL/SQL. See <a href="https://ora-00001.blogspot.com/2017/03/using-vs-code-for-plsql-development.html">notes on using VS Code with PL/SQL</a> and <a href="https://marketplace.visualstudio.com/items?itemName=xyz.plsql-language">PL/SQL language extension for VS Code</a>.</p>
 	</div></section>
 
 
