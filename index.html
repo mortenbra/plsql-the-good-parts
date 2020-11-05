@@ -47,6 +47,24 @@
 		</style>
 	</div></section>
 
+	<section class="slide"><div>
+		<h2>There's always <u>something</u> good ;-)</h2>
+		<img src="pictures/js_good_parts.jpg">
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>About Me: Morten Braten</h2>
+		<p style="width:80%;">Developer, consultant, freelancer, small business owner.<br>
+		Working with the Oracle Database and PL/SQL since 1997.<br>
+		Winner of the "Oracle Developer Choice Awards" in 2015<br>
+		in the APEX and ORDS categories.</p>
+		<img src="pictures/oracle_dev_choice_awards_2015.jpg" style="height:325px;position:absolute;right:25px;bottom:25px;">
+		<ul>
+		<li><a href="https://twitter.com/mortenbraten">twitter.com/mortenbraten</a></li>
+		<li><a href="https://github.com/mortenbra">github.com/mortenbra</a></li>
+		<li><a href="https://ora-00001.blogspot.com/">ora-00001.blogspot.com</a></li>
+	    </ul>
+	</div></section>
 
 	<section class="slide"><div>
 		<h2>Disclaimer</h2>
@@ -337,10 +355,10 @@ select * from table(search_pkg.get_search_results(...));
 <section class="slide"><div>
 		<h2>PL/SQL Code Runs INSIDE the Database</h2>
 		<ol>
-			<li>Easy (easy to use SQL and database features directly; no need for client drivers, connection management, frameworks, and boilerplate code)</li>
-			<li class="next">Efficient (reduces network traffic)</li>
-			<li class="next">Secure (integrated with database security features; provides an API on top of tables for clients)</li>
-			<li class="next">Portable (runs on any OS that the database runs on; can be called from any other programming language)</li>
+			<li><b>Easy</b> (easy to use SQL and database features directly; no need for client drivers, connection management, frameworks, and boilerplate code)</li>
+			<li class="next"><b>Efficient</b> (reduces network traffic, see <a href="https://t.co/UsDvZCZRSP?amp=1">this video</a> showing 10X to 100X better performance than code running outside database)</li>
+			<li class="next"><b>Secure</b> (integrated with database security features; provides an API on top of tables for clients)</li>
+			<li class="next"><b>Portable</b> (runs on any OS that the database runs on; can be called from any other programming language)</li>
 		</ol>
 	</div></section>
 
@@ -473,13 +491,13 @@ l_new_xml := l_xml.transform (l_xsl_stylesheet);
 
 <section class="slide"><div>
 		<h2>JSON</h2>
-		<p>Oracle 12 has native JSON support, Apex 5 has apex_json package.</p>
+		<p>Oracle 12+ has native JSON support, APEX 5 has apex_json package.</p>
 		<pre>
-			<code>-- Oracle 12
+			<code>-- Oracle 12+
 select <mark>i.my_json_column.CustomerData.CreditRating</mark>
 from invoice i
 
--- Oracle 10/11 with Apex 5
+-- Oracle 10/11 with APEX 5
 <mark>apex_json</mark>.parse(l_values, '{"items":[1,2,{"foo":42}]}');
 l_val := apex_json.get_varchar2(
   p_path=>'items[%d].foo', p0 => 3, p_values => l_values));
@@ -525,7 +543,7 @@ end;
 			<code><mark>htp.p</mark>('&lt;div id="my-widget"&gt;Hello World&lt;/div&gt;');
 </code>
 		</pre>
-		<p>* Supported options include the Embedded PL/SQL Gateway aka dbms_epg, Apache mod_plsql, or Oracle REST Data Services aka ORDS.</p>
+		<p>* Such as the official <a href="https://www.oracle.com/database/technologies/appdev/rest.html">Oracle REST Data Services (aka ORDS)</a> or the unofficial <a href="https://github.com/mortenbra/thoth-gateway">Thoth Gateway</a>.</p>
 	</div></section>
 
 <section class="slide"><div>
@@ -545,12 +563,12 @@ end;
 	<section class="slide"><div>
 		<h2>Best Practices</h2>
 		<ol>
-			<li>Instrument your code by logging debug messages, warnings and errors (see <a href="https://github.com/OraOpenSource/Logger">Logger for PL/SQL</a>). Leave the logging on in production.</li>
-			<li class="next">Use assertions to validate program inputs and outputs</li>
-			<li class="next">Functions should have one (and only one!) <code>return</code> statement</li>
-			<li class="next">Use exceptions (not error return codes!) to deal with errors</li>
-			<li class="next">Use information in the error stack (backtrace) to track down errors</li>
-			<li class="next">Use the data dictionary to verify absence of compilation errors</li>
+			<li><b>Instrument</b> your code by logging debug messages, warnings and errors (see <a href="https://github.com/OraOpenSource/Logger">Logger for PL/SQL</a>). Leave the logging on in production.</li>
+			<li class="next">Use <b>assertions</b> to validate program inputs and outputs</li>
+			<li class="next">Functions should have <b>one (and only one!)</b> <code>return</code> statement</li>
+			<li class="next">Use <b>exceptions</b> (not error return codes!) to deal with errors</li>
+			<li class="next">Use information in the <b>error stack</b> (backtrace) to track down errors</li>
+			<li class="next">Use the <b>data dictionary</b> to verify absence of compilation errors</li>
 		</ol>
 	</div></section>
 
@@ -658,35 +676,6 @@ select * from user_errors;
 		</pre>
 	</div></section>
 
-	
-
-	<section class="slide cover"><div>
-		<h2>The Bad Parts</h2>
-		<img src="pictures/vintage-grey-airplane.jpg">
-	</div></section>
-
-	<section class="slide"><div>
-		<h2>Bad parts? What bad parts?</h2>
-		<p>Actually, PL/SQL does not have too many bad parts (and unlike Javascript, it does not have many bizarre quirks, either), but it just seems proper to devote a couple of slides to its limitations and annoyances. There's always room for improvement, right?</p>
-	</div></section>
-
-	<section class="slide"><div>
-		<h2>Limitations</h2>
-		<ol>
-			<li><span style="text-decoration:line-through;">Identifiers (names of tables, packages, variables, etc) limited to 30 characters</span> (<a href="http://ora-00001.blogspot.com/2015/07/longer-names-coming-to-oracle.html">increased to 128 characters in Oracle 12.2</a>)</li>
-			<li class="next">Cannot use PL/SQL package constants in SQL that is called outside of PL/SQL (this includes SQL in views), and therefore must "hardcode" literal strings and numbers in such cases</li>
-		</ol>
-	</div></section>
-
-	<section class="slide"><div>
-		<h2>Annoyances</h2>
-		<ol>
-			<li class="next">No boolean data type in SQL, hence not possible to call PL/SQL functions with boolean parameters from SQL (workaround: write a wrapper that uses Y/N strings)</li>
-			<li class="next">The :old and :new pseudo-records in triggers cannot be passed to subprograms as records or %rowtypes (workaround: pass each value separately)</li>
-			<li class="next">UTL_FILE has no function to return a list of files in a folder (unsupported workaround exists)</li>
-			<!--<li class="next">Oracle Wallets are fiddly to work with, since certificates must be explicitly added before you can use UTL_HTTP with SSL</li>-->
-		</ol>
-	</div></section>
 
 	<section class="slide cover"><div>
 		<h2>The PL/SQL Coding Environment</h2>
@@ -702,6 +691,28 @@ select * from user_errors;
 			<li>Include standard comment blocks for packages, functions and procedures</li>
 		</ol>
 		<p class="note">These are only recommendations (but they are good recommendations!). Whatever you choose, be consistent.</p>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Use Code Generators</h2>
+		<p>Use a code generator (such as <a href="https://tinyurl.com/quickplsql2">tinyurl.com/quickplsql2</a> or <a href="https://www.oddgen.org/">oddgen.org</a>) to quickly create standards-compliant and error-free boilerplate code</p>
+		<img src="pictures/quickplsql.png">
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Use the Data Dictionary to Generate Code</h2>
+		<p>Use the information in the <a href="https://docs.oracle.com/cd/E11882_01/nav/catalog_views.htm">data dictionary</a> to quickly generate code.</p>
+		<pre>
+			<code>select 'drop table ' || table_name || ' purge;'
+from <mark>user_tables</mark>
+where table_name like 'TEST%'
+order by table_name;
+
+drop table TEST_01 purge;
+drop table TEST_STUFF purge;
+drop table TEST_XYZ purge;
+</code>
+		</pre>
 	</div></section>
 
 	<section class="slide"><div>
@@ -758,21 +769,6 @@ from <mark>user_source</mark>;
 		</pre>
 	</div></section>
 
-	<section class="slide"><div>
-		<h2>Use the Data Dictionary to Generate Code</h2>
-		<p>Use the information in the <a href="https://docs.oracle.com/cd/E11882_01/nav/catalog_views.htm">data dictionary</a> to quickly generate code.</p>
-		<pre>
-			<code>select 'drop table ' || table_name || ' purge;'
-from <mark>user_tables</mark>
-where table_name like 'TEST%'
-order by table_name;
-
-drop table TEST_01 purge;
-drop table TEST_STUFF purge;
-drop table TEST_XYZ purge;
-</code>
-		</pre>
-	</div></section>
 
 <section class="slide"><div>
 		<h2>Dependency Tracking</h2>
@@ -855,6 +851,38 @@ from user_plsql_object_settings;
 		</ol>
 	</div></section>
 
+	<section class="slide cover"><div>
+		<h2>The Bad Parts</h2>
+		<img src="pictures/vintage-grey-airplane.jpg">
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Bad parts? What bad parts?</h2>
+		<p>Actually, PL/SQL does not have too many bad parts (and unlike Javascript, it does not have many bizarre quirks, either), but it just seems proper to devote a couple of slides to its limitations and annoyances. There's always room for improvement, right?</p>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Limitations</h2>
+		<ol>
+			<li><span style="text-decoration:line-through;">Identifiers (names of tables, packages, variables, etc) limited to 30 characters</span> (<a href="http://ora-00001.blogspot.com/2015/07/longer-names-coming-to-oracle.html">increased to 128 characters in Oracle 12.2</a>)</li>
+			<li class="next">Cannot use PL/SQL package constants in SQL that is called outside of PL/SQL (this includes SQL in views), and therefore must "hardcode" literal strings and numbers in such cases</li>
+		</ol>
+	</div></section>
+
+	<section class="slide"><div>
+		<h2>Annoyances</h2>
+		<ol>
+			<li class="next">No boolean data type in SQL, hence not possible to call PL/SQL functions with boolean parameters from SQL (workaround: write a wrapper that uses Y/N strings)</li>
+			<li class="next">The :old and :new pseudo-records in triggers cannot be passed to subprograms as records or %rowtypes (workaround: pass each value separately)</li>
+			<li class="next">UTL_FILE has no function to return a list of files in a folder (unsupported workaround exists)</li>
+			<!--<li class="next">Oracle Wallets are fiddly to work with, since certificates must be explicitly added before you can use UTL_HTTP with SSL</li>-->
+		</ol>
+	</div></section>
+
+	<section class="slide cover"><div>
+		<h2 class="invert">Want to learn more?</h2>
+		<img src="pictures/computer-desk.jpg">
+	</div></section>
 
 	<section class="slide"><div>
 		<h2>PL/SQL Resources</h2>
@@ -863,14 +891,9 @@ from user_plsql_object_settings;
 			<li><a href="http://docs.oracle.com/database/121/LNPLS/toc.htm">PL/SQL Language Reference</a></li>
 			<li><a href="http://docs.oracle.com/database/121/ARPLS/toc.htm">PL/SQL Packages and Types Reference</a></li>
 			<li><a href="https://www.youtube.com/channel/UCpJpLMRm452kVcie3RpINPw/feed?view_as=public">Practically Perfect PL/SQL</a> YouTube Channel by Steven Feuerstein</li>
-			<li><a href="http://tutorials.plsqlchannel.com/public/">PL/SQL Channel</a>, aka "PL/SQL from dusk till dawn" with 27 hours (!) of video by Steven Feuerstein</li>
+			<li><a href="https://asktom.oracle.com/">Ask the Oracle Mentors</a> aka AskTOM</li>
 		</ol>
 	</div></section>
-
-	<section class="slide shout"><div>
-		<h2>Procedural Language / <span style="color:orange;">Structured Query Language</span></h2>
-	</div></section>
-
 
 	<section class="slide"><div>
 		<h2>Do it in SQL</h2>
@@ -882,11 +905,18 @@ from user_plsql_object_settings;
 		</figure>
 	</div></section>
 
-<!--
+	<!--
+
+	<section class="slide shout"><div>
+		<h2>Procedural Language / <span style="color:orange;">Structured Query Language</span></h2>
+	</div></section>
+
+	-->
+
+
 	<section class="slide shout"><div>
 		<h2>begin null; <span style="color:orange;">end;</span></h2>
 	</div></section>
--->
 
 	<section class="slide shout" id="SeeMore"><div>
 		<h2><a href="https://twitter.com/mortenbraten">@mortenbraten</a></h2>
